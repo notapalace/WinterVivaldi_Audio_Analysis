@@ -1,0 +1,66 @@
+[x, fs] = audioread('WinterVivaldiLive.mp3'); 
+
+if size(x, 2) > 1
+    x = x(:, 1); 
+end
+
+N = length(x);             
+t = (0:N-1)/fs;  
+
+X_fft = fft(x);             
+X_mag = abs(X_fft/N);      
+f = (0:N-1)*(fs/N);    
+
+fc = 2500; 
+
+X_lowpass = X_fft;
+X_lowpass((f > fc) & (f < (fs - fc))) = 0;
+
+x_reconstructed_live = real(ifft(X_lowpass));
+
+figure('Name', 'Signal Processing Analysis', 'Position', [100, 100, 950, 650]);
+half_N = floor(N/2); 
+
+sgtitle('Audio Analysis Using Fourier Transfrorm with Winter by Vivaldi', 'FontSize', 16, 'FontWeight', 'bold');
+
+subplot(2,2,1);
+plot(t, x, 'Color', 'Blue'); 
+title('1. Original Audio Waveform');
+xlabel('Time (seconds)'); ylabel('Amplitude');
+grid on;
+
+subplot(2,2,2);
+plot(f(1:half_N), X_mag(1:half_N), 'Color', 'Blue'); 
+title('2. Original Frequency Spectrum');
+xlabel('Frequency (Hz)'); ylabel('Magnitude');
+xlim([0 5000]);
+grid on;
+
+subplot(2,2,3);
+plot(t, x, 'Color', 'Red'); hold on;        
+plot(t, x_reconstructed_live, 'Color', 'Blue');    
+hold off;
+title('3. Filtered Audio Waveform');
+xlabel('Time (seconds)'); ylabel('Amplitude');
+grid on;
+
+X_mag_lp = abs(X_lowpass/N);
+subplot(2,2,4);
+plot(f(1:half_N), X_mag(1:half_N), 'Color', 'Red'); hold on;
+plot(f(1:half_N), X_mag_lp(1:half_N), 'Color', 'Blue'); 
+hold off;
+title('4. Filtered Frequency Spectrum');
+xlabel('Frequency (Hz)'); ylabel('Magnitude');
+xlim([0 5000]);
+grid on;
+
+fprintf('Playing original audio...\n');
+sound(x, fs);
+pause(N/fs + 1);
+
+fprintf('Playing low-pass filtered audio...\n');
+sound(x_reconstructed_live, fs);
+
+outputFilename = 'x_reconstructed_live.mp3';
+audiowrite('x_reconstructed_live.mp3', x_reconstructed_live, fs);
+
