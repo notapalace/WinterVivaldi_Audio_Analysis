@@ -1,4 +1,4 @@
-[x, fs] = audioread('WinterVivaldiLive.mp3'); 
+[x, fs] = audioread('WinterVivaldi.mp3'); 
 
 if size(x, 2) > 1
     x = x(:, 1); 
@@ -16,7 +16,7 @@ fc = 2500;
 X_lowpass = X_fft;
 X_lowpass((f > fc) & (f < (fs - fc))) = 0;
 
-x_reconstructed_live = real(ifft(X_lowpass));
+WinterVivaldi_Reconstructed = real(ifft(X_lowpass));
 
 figure('Name', 'Signal Processing Analysis', 'Position', [100, 100, 950, 650]);
 half_N = floor(N/2); 
@@ -38,7 +38,7 @@ grid on;
 
 subplot(2,2,3);
 plot(t, x, 'Color', 'Red'); hold on;        
-plot(t, x_reconstructed_live, 'Color', 'Blue');    
+plot(t, WinterVivaldi_Reconstructed, 'Color', 'Blue');    
 hold off;
 title('3. Filtered Audio Waveform');
 xlabel('Time (seconds)'); ylabel('Amplitude');
@@ -59,8 +59,7 @@ sound(x, fs);
 pause(N/fs + 1);
 
 fprintf('Playing low-pass filtered audio...\n');
-sound(x_reconstructed_live, fs);
+sound(WinterVivaldi_Reconstructed, fs);
 
-outputFilename = 'x_reconstructed_live.mp3';
-audiowrite('x_reconstructed_live.mp3', x_reconstructed_live, fs);
-
+outputFilename = 'WinterVivaldi_Reconstructed.mp3';
+audiowrite('WinterVivaldi_Reconstructed.mp3', WinterVivaldi_Reconstructed, fs);
